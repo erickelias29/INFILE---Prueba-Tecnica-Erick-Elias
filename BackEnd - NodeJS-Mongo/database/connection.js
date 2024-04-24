@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const connection = async() => {
 
     try {
-        const url = "mongodb://localhost:27017/news"
+        const url = "mongodb://localhost:27017/Noticias"
         
         await mongoose.connect(url);
 
