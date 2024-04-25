@@ -14,7 +14,12 @@ const app = express();
 const port = 3900;
 
 //Configurar CORS
-app.use(cors());
+//app.use(cors());
+
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+  }));
 
 //Convertir body a objeto JS
 app.use(express.json()); // Para content-type app/JSON
