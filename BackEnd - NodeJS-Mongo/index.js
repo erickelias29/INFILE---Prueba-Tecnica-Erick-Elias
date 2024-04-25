@@ -23,10 +23,12 @@ app.use(express.urlencoded({extended:true}));//Para form/urlEncoded
 //Crear rutas
 const rutas_noticia = require("./routes/Noticia");
 const rutas_usuarios = require("./routes/Usuario");
+const rutas_categorias = require("./routes/Categoria");
 
 //Cargar Rutas
 app.use("/api", rutas_noticia);
 app.use("/api", rutas_usuarios);
+app.use("/api", rutas_categorias);
 
 
 //Crear servidor y escuchar peticiones

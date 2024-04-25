@@ -75,10 +75,82 @@ const getNoticiaById = (req, res) => {
     });
 };
 
+const getNoticiasRecomendadasA = (req, res) => {
+    const id = req.params.id;
+    
+    let consulta = Noticia.findById(id).exec();
+
+    consulta.then((noticias) => {
+        if (!noticias || noticias.length === 0) {
+            return res.status(404).json({
+                status: "Error",
+                message: "No se han encontrado noticias"
+            });
+        }
+
+        console.log(noticias);
+
+
+        return res.status(200).send({
+            status: "success",
+            noticias
+        });
+    }).catch((error) => {
+        return res.status(500).json({
+            status: "Error",
+            message: "Ocurrió un error al buscar las noticias"
+        });
+    });
+};
+
+const getNoticiasRecomendadas = (req, res) => {
+    const id = req.params.id;
+    
+   
+    Noticia.findById(id).exec()
+        .then(noticia => {
+            if (!noticia) {
+                return res.status(404).json({
+                    status: "Error",
+                    message: "No se ha encontrado la noticia con el ID proporcionado"
+                });
+            }
+
+            console.log(noticia.categoria);
+
+            Noticia.aggregate([
+                { $match: { _id: { $ne: noticia._id }, categoria: { $in: noticia.categoria } } },
+                { $sample: { size: 5 } }
+            ])
+            .then(noticiasRecomendadas => {
+                res.status(200).json({
+                    status: "Success",
+                    noticiasRecomendadas
+                });
+            })
+            .catch(error => {
+                res.status(500).json({
+                    status: "Error",
+                    message: "Ocurrió un error al buscar noticias recomendadas"
+                });
+            });
+
+        })
+        .catch(error => {
+            res.status(500).json({
+                status: "Error",
+                message: "Ocurrió un error al buscar la noticia original"
+            });
+        });
+};
+
+
+
 
 module.exports = {
     test,
     crearNoticia,
     getNoticias,
-    getNoticiaById
+    getNoticiaById,
+    getNoticiasRecomendadas
 }
