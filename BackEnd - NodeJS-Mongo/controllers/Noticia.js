@@ -28,7 +28,32 @@ const crearNoticia = async (req, res) => {
 }
 
 const getNoticias = (req, res) => {
-    let consulta = Noticia.find({}).exec();
+    let consulta = Noticia.find({}, 'titulo imagen descripcion').exec();
+
+    consulta.then((noticias) => {
+        if (!noticias || noticias.length === 0) {
+            return res.status(404).json({
+                status: "Error",
+                message: "No se han encontrado noticias"
+            });
+        }
+
+        return res.status(200).send({
+            status: "success",
+            noticias
+        });
+    }).catch((error) => {
+        return res.status(500).json({
+            status: "Error",
+            message: "Ocurrió un error al buscar las noticias"
+        });
+    });
+};
+
+const getNoticiaById = (req, res) => {
+    const id = req.params.id;
+    
+    let consulta = Noticia.findById(id).exec();
 
     consulta.then((noticias) => {
         if (!noticias || noticias.length === 0) {
@@ -54,5 +79,6 @@ const getNoticias = (req, res) => {
 module.exports = {
     test,
     crearNoticia,
-    getNoticias
+    getNoticias,
+    getNoticiaById
 }

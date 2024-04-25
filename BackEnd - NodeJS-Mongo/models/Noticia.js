@@ -30,4 +30,4 @@ const NoticiaSchema = new Schema({
     }
 });
 
-module.exports = model("Noticia", NoticiaSchema, "noticias");
+module.exports = model("Noticias", NoticiaSchema, "noticias");
