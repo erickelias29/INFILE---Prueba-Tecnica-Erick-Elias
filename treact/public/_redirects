@@ -1,0 +1,3 @@
+http://tnews.netlify.app/* https://tnews.owaiskhan.me/:splat 301!
+https://tnews.netlify.app/* https://tnews.owaiskhan.me/:splat 301!
+/*  /index.html  200
