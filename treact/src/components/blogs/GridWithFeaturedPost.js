@@ -68,6 +68,13 @@ export default function Page() {
 
   const navigate = useNavigate(); 
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
+  };
+
+  const isLoggedIn = localStorage.getItem("token");
+
   const handlePostClick = (postId) => {
     // Redirige a la página de detalles con el ID del post
     navigate(`/components/landingPages/NewsDetailLandingPage?id=${postId}`);

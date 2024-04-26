@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AnimationRevealPage from "helpers/AnimationRevealPage.js";
 import { Container as ContainerBase } from "components/misc/Layouts";
 import tw from "twin.macro";
@@ -9,6 +9,7 @@ import logo from "images/logo.svg";
 import googleIconImageSrc from "images/google-icon.png";
 import twitterIconImageSrc from "images/twitter-icon.png";
 import { ReactComponent as SignUpIcon } from "feather-icons/dist/icons/user-plus.svg";
+import { useNavigate } from "react-router-dom";
 
 const Container = tw(ContainerBase)`min-h-screen bg-primary-900 text-white font-medium flex justify-center -m-8`;
 const Content = tw.div`max-w-screen-xl m-0 sm:mx-20 sm:my-16 bg-white text-gray-900 shadow sm:rounded-lg flex justify-center flex-1`;
@@ -53,83 +54,99 @@ const IllustrationImage = styled.div`
   ${tw`m-12 xl:m-16 w-full max-w-lg bg-contain bg-center bg-no-repeat`}
 `;
 
-export default ({
+const SignupForm = ({
   logoLinkUrl = "#",
   illustrationImageSrc = illustration,
   headingText = "Sign Up For tnews",
-  socialButtons = [
-    {
-      iconImageSrc: googleIconImageSrc,
-      text: "Sign Up With Google",
-      url: "https://google.com"
-    },
-    {
-      iconImageSrc: twitterIconImageSrc,
-      text: "Sign Up With Twitter",
-      url: "https://twitter.com"
-    }
-  ],
   submitButtonText = "Sign Up",
   SubmitButtonIcon = SignUpIcon,
   tosUrl = "#",
   privacyPolicyUrl = "#",
   signInUrl = "/components/innerPages/LoginPage"
-}) => (
-  <AnimationRevealPage>
-    <Container>
-      <Content>
-        <MainContainer>
-          <LogoLink href={logoLinkUrl}>
-            <LogoImage src={logo} />
-          </LogoLink>
-          <MainContent>
-            <Heading>{headingText}</Heading>
-            <FormContainer>
-              <SocialButtonsContainer>
-                {socialButtons.map((socialButton, index) => (
-                  <SocialButton key={index} href={socialButton.url}>
-                    <span className="iconContainer">
-                      <img src={socialButton.iconImageSrc} className="icon" alt="" />
-                    </span>
-                    <span className="text">{socialButton.text}</span>
-                  </SocialButton>
-                ))}
-              </SocialButtonsContainer>
-              <DividerTextContainer>
-                <DividerText>Or Sign up with your e-mail</DividerText>
-              </DividerTextContainer>
-              <Form>
-                <Input type="email" placeholder="Email" />
-                <Input type="password" placeholder="Password" />
-                <SubmitButton type="submit">
-                  <SubmitButtonIcon className="icon" />
-                  <span className="text">{submitButtonText}</span>
-                </SubmitButton>
-                <p tw="mt-6 text-xs text-gray-600 text-center">
-                  I agree to abide by tnews's{" "}
-                  <a href={tosUrl} tw="border-b border-gray-500 border-dotted">
-                    Terms of Service
-                  </a>{" "}
-                  and its{" "}
-                  <a href={privacyPolicyUrl} tw="border-b border-gray-500 border-dotted">
-                    Privacy Policy
-                  </a>
-                </p>
+}) => {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const navigate = useNavigate();
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setErrorMessage('');
+    try {
+      const response = await fetch('http://localhost:3900/api/crearUsuario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password
+        })
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        setSuccessMessage('User created successfully!'); // Set the success message
+        setTimeout(() => {
+          navigate('/components/innerPages/LoginPage'); // Redirect after showing success message
+        }, 2000); // Adjust the timeout as needed
+      } else if (response.status === 409) {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message); // Error message from the server
+      } else {
+        console.error('Failed to create user', await response.text());
+        setErrorMessage('Failed to create user. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Failed to send request', error);
+      setErrorMessage('Failed to send request. Please try again later.');
+    }
+  };
+  
+  return (
+    <AnimationRevealPage>
+      <Container>
+        <Content>
+          <MainContainer>
+            <LogoLink href={logoLinkUrl}>
+              <LogoImage src={logo} />
+            </LogoLink>
+            <MainContent>
+              <Heading>{headingText}</Heading>
+              <FormContainer>
+                <DividerTextContainer>
+                  <DividerText>Sign up with your e-mail</DividerText>
+                </DividerTextContainer>
+                <Form onSubmit={handleSubmit}>
+                  <Input type="username" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+                  <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+                  <Input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+                  <SubmitButton type="submit">
+                    <SubmitButtonIcon className="icon" />
+                    <span className="text">{submitButtonText}</span>
+                  </SubmitButton>
+                  {errorMessage && <p tw="mt-3 text-sm text-red-500 text-center">{errorMessage}</p>}
+                  {successMessage && <p tw="mt-3 text-sm text-green-500 text-center">{successMessage}</p>}
+                </Form>
                 <p tw="mt-8 text-sm text-gray-600 text-center">
                   Already have an account?{" "}
                   <a href={signInUrl} tw="border-b border-gray-500 border-dotted">
                     Sign In
                   </a>
                 </p>
-              </Form>
-            </FormContainer>
-          </MainContent>
-        </MainContainer>
-        <IllustrationContainer>
-          <IllustrationImage imageSrc={illustrationImageSrc} />
-        </IllustrationContainer>
-      </Content>
-    </Container>
-  </AnimationRevealPage>
-);
+              </FormContainer>
+            </MainContent>
+          </MainContainer>
+          <IllustrationContainer>
+            <IllustrationImage imageSrc={illustrationImageSrc} />
+          </IllustrationContainer>
+        </Content>
+      </Container>
+    </AnimationRevealPage>
+  );
+};
+
+export default SignupForm;

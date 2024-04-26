@@ -12,7 +12,15 @@ import SubscribeNewsLetterForm from "components/forms/SimpleSubscribeNewsletter.
 import Footer from "components/footers/MiniCenteredFooter.js";
 
 export default () => (
+
+  // const [categoria, setCategoria] = useState(null);
+
+  // <Hero props={setCategoria} />
+  // <Blog props={categoria} />
+
   <AnimationRevealPage>
+
+    
     <Hero />
     <Blog />
     

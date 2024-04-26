@@ -48,6 +48,12 @@ const RecentPostsContainer = styled.div`
   }
 `;
 const PostTextContainer = tw.div``
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  window.location.reload();
+};
+
+const isLoggedIn = localStorage.getItem("token");
 
 export default () => {
   const [popularPosts, setPopularPosts] = useState([]);
@@ -62,6 +68,13 @@ export default () => {
       backgroundSize: "110%"
     }
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
+  };
+
+  const isLoggedIn = localStorage.getItem("token");
 
   useEffect(() => {
     const url = 'http://localhost:3900/api/getNoticias';
@@ -91,6 +104,9 @@ export default () => {
 
   const indexOfLastnews = currentPage * newsPerPage;
   const indexOfFirstnews = indexOfLastnews - newsPerPage;
+  // const categoria = props.categoria
+  // const tempPopularPosts = prompt.categoria ? popularPosts.map(element => element.categoria.includes(categoria)) : popularPosts
+  // const currentnews = tempPopularPosts.slice(indexOfFirstnews, indexOfLastnews);
   const currentnews = popularPosts.slice(indexOfFirstnews, indexOfLastnews);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -99,10 +115,13 @@ export default () => {
   const pageCount = Math.ceil(popularPosts.length / newsPerPage);
 
   const navigate = useNavigate(); 
+  
+  
 
   const handlePostClick = (postId) => {
     // Redirige a la página de detalles con el ID del post
-    navigate(`/components/landingPages/NewsDetailLandingPage?id=${postId}`);
+    if(!isLoggedIn){navigate(`/components/innerPages/LoginPage`);}else{navigate(`/components/landingPages/NewsDetailLandingPage?id=${postId}`);}
+    
   };
 
   return (
